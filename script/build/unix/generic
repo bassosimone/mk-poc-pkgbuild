@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+PKG_TOPDIR=$(cd $(dirname $0)/../../../ && pwd -P)
+if [ "${PKG_OS}" = "" ]; then
+  export PKG_OS=`uname -s | tr -s 'A-Z' 'a-z'`
+fi
+if [ "${PKG_ARCH}" = "" ]; then
+  export PKG_ARCH=`uname -m | tr -s 'A-Z' 'a-z'`
+fi
+${PKG_TOPDIR}/script/build/generic/generic

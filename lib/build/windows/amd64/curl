@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+cget install --release                        \
+             -DCURL_STATICLIB=ON              \
+             -DHTTP_ONLY=ON                   \
+             -DCMAKE_USE_WINSSL=ON            \
+             -G "Visual Studio 15 2017 Win64" \
+             curl/curl@curl-7_59_0

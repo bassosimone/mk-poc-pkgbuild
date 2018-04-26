@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+PKG_TOPDIR=$(cd $(dirname $0)/../../../ && pwd -P)
+
+export PKG_NAME="libevent"
+export PKG_CHECKSUM="316ddb401745ac5d222d7c529ef1eada12f58f6376a66c1118eee803cb70f83d"
+export PKG_VERSION="2.1.8"
+export PKG_URL="https://github.com/libevent/libevent/archive/release-${PKG_VERSION}-stable.tar.gz"
+export CONFIGUREFLAGS="${CONFIGUREFLAGS} --disable-shared --disable-samples --disable-libevent-regress --disable-clock-gettime"
+export PKG_BUILD_VERSION="2"
+export PKG_BUILD_SYSTEM="autotools"
+export PKG_SRCDIRNAME="libevent-release-${PKG_VERSION}-stable"
+export PKG_BOOTSTRAP="./autogen.sh"
+
+# To use the proper libressl
+LIBRESSL_VERSION="2.6.4-2"
+LIBRESSL_DIR="${PKG_TOPDIR}/MK_DIST/${PKG_OS}/${PKG_ARCH}/libressl-${LIBRESSL_VERSION}"
+export CPPFLAGS="${CPPFLAGS} -I${LIBRESSL_DIR}/include"
+export LDFLAGS="${LDFLAGS} -L${LIBRESSL_DIR}/lib"
+
+${PKG_TOPDIR}/script/build/unix/generic

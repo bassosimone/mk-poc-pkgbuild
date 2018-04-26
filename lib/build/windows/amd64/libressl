@@ -1,0 +1,6 @@
+#!/bin/sh
+set -e
+url=https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-2.6.4.tar.gz
+cget install --release                        \
+             -G "Visual Studio 15 2017 Win64" \
+             $url

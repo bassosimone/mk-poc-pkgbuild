@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+PKG_TOPDIR=$(cd $(dirname $0)/../../../ && pwd -P)
+
+export PKG_BUILD_VERSION="2"
+GEOIP_DIR=${PKG_TOPDIR}/MK_DIST/${PKG_OS}/${PKG_ARCH}/geoip-1.6.12-2
+LIBEVENT_DIR=${PKG_TOPDIR}/MK_DIST/${PKG_OS}/${PKG_ARCH}/libevent-2.1.8-2
+OPENSSL_DIR=${PKG_TOPDIR}/MK_DIST/${PKG_OS}/${PKG_ARCH}/libressl-2.6.4-2
+
+export PKG_NAME="measurement_kit"
+export PKG_BOOTSTRAP="./autogen.sh -n"
+export PKG_CHECKSUM="fdfe9fe0155492e11d1c51ff470c27e60c54f093652bd44a147f370a76e670e7"
+export PKG_VERSION="0.9.0-alpha"
+export PKG_URL="https://github.com/measurement-kit/measurement-kit/archive/v${PKG_VERSION}.tar.gz"
+export CONFIGUREFLAGS="${CONFIGUREFLAGS} --disable-shared --disable-examples --with-geoip=${GEOIP_DIR} --with-libevent=${LIBEVENT_DIR} --with-openssl=${OPENSSL_DIR}"
+export PKG_BUILD_SYSTEM="autotools"
+export PKG_SRCDIRNAME="measurement-kit-${PKG_VERSION}"
+
+${PKG_TOPDIR}/script/build/unix/generic

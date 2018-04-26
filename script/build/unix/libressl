@@ -1,0 +1,18 @@
+#!/bin/sh
+set -e
+PKG_TOPDIR=$(cd $(dirname $0)/../../../ && pwd -P)
+
+export PKG_NAME="libressl"
+export PKG_CHECKSUM="638a20c2f9e99ee283a841cd787ab4d846d1880e180c4e96904fc327d419d11f"
+export PKG_VERSION="2.6.4"
+export PKG_URL="https://ftp.openbsd.org/pub/OpenBSD/LibreSSL/libressl-${PKG_VERSION}.tar.gz"
+export CONFIGUREFLAGS="${CONFIGUREFLAGS} --disable-shared"
+export PKG_BUILD_VERSION="2"
+export PKG_BUILD_SYSTEM="autotools"
+export PKG_SRCDIRNAME="libressl-${PKG_VERSION}"
+
+# Required because `autoreconf -i` was probably run on Linux and so when
+# building for Android on macOS there is an attempt to run `ldconfig`.
+export PKG_BOOTSTRAP="autoreconf -i"
+
+${PKG_TOPDIR}/script/build/unix/generic

@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+PKG_TOPDIR=$(cd $(dirname $0)/../../../ && pwd -P)
+
+export CONFIGUREFLAGS="${CONFIGUREFLAGS} --disable-shared"
+export PKG_BOOTSTRAP="./bootstrap"
+export PKG_NAME="geoip"
+export PKG_BUILD_SYSTEM="autotools"
+export PKG_BUILD_VERSION="2"
+export PKG_CHECKSUM="99b119f8e21e94f1dfd6d49fbeed29a70df1544896e76cd456f25e397b07d476"
+export PKG_VERSION="1.6.12"
+export PKG_URL="https://github.com/maxmind/geoip-api-c/archive/v${PKG_VERSION}.tar.gz"
+export PKG_SRCDIRNAME="geoip-api-c-${PKG_VERSION}"
+
+# Both required by GeoIP `./configure`; see issue #518
+export ac_cv_func_malloc_0_nonnull=yes
+export ac_cv_func_realloc_0_nonnull=yes
+
+${PKG_TOPDIR}/script/build/unix/generic

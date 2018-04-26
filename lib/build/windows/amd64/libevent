@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+cget install --release                           \
+             -G "Visual Studio 15 2017 Win64"    \
+             -DEVENT__DISABLE_BENCHMARK=ON       \
+             -DEVENT__DISABLE_TESTS=ON           \
+             -DEVENT__DISABLE_REGRESS=ON         \
+             -DEVENT__DISABLE_SAMPLES=ON         \
+             -DEVENT__BUILD_SHARED_LIBRARIES=OFF \
+             libevent/libevent@da028dec

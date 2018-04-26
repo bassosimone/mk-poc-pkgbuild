@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+for PKG_OS in `ls MK_DIST`; do
+  for PKG_ARCH in `ls MK_DIST/${PKG_OS}`; do
+    for PKG_FULLNAME in `ls MK_DIST/${PKG_OS}/${PKG_ARCH}`; do
+      PKG_CHECKSUM_DB=checksum/${PKG_OS}/${PKG_ARCH}/${PKG_FULLNAME}.txt
+      PKG_TARBALL=${PKG_OS}-${PKG_ARCH}-${PKG_FULLNAME}.tar.gz
+      if [ -f $PKG_CHECKSUM_DB ]; then
+        echo "WARNING: ${PKG_TARBALL} already released" 1>&2
+        continue
+      fi
+      set -x
+      tar -cvzf ${PKG_TARBALL} MK_DIST/${PKG_OS}/${PKG_ARCH}/${PKG_FULLNAME}
+      install -d `dirname ${PKG_CHECKSUM_DB}`
+      cmake -E sha256sum ${PKG_TARBALL} | awk '{print $1}' > ${PKG_CHECKSUM_DB}
+      set +x
+    done
+  done
+done

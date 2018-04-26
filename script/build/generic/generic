@@ -1,0 +1,92 @@
+#!/bin/sh
+set -e
+PKG_TOPDIR=$(cd $(dirname $0)/../../../ && pwd -P)
+
+echo "BOOTSTRAPFLAGS: ${BOOTSTRAPFLAGS}"
+echo "CC: ${CC}"
+echo "CFLAGS: ${CFLAGS}"
+echo "CMAKEBUILDFLAGS: ${CMAKEBUILDFLAGS}"
+echo "CMAKEFLAGS: ${CMAKEFLAGS}"
+echo "CMAKEINSTALLFLAGS: ${CMAKEINSTALLFLAGS}"
+echo "CMAKE_GENERATOR: ${CMAKE_GENERATOR}"
+echo "CONFIGUREFLAGS: ${CONFIGUREFLAGS}"
+echo "CPPFLAGS: ${CPPFLAGS}"
+echo "CURLFLAGS: ${CURLFLAGS}"
+echo "CXX: ${CXX}"
+echo "CXXFLAGS: ${CXXFLAGS}"
+echo "LDFLAGS: ${LDFLAGS}"
+echo "MAKEFLAGS: ${MAKEFLAGS}"
+echo "PKG_ARCH: ${PKG_ARCH}"
+echo "PKG_BOOTSTRAP: ${PKG_BOOTSTRAP}"
+echo "PKG_BUILD_SYSTEM: ${PKG_BUILD_SYSTEM}"
+echo "PKG_BUILD_VERSION: ${PKG_BUILD_VERSION}"
+echo "PKG_CHECKSUM: ${PKG_CHECKSUM}"
+echo "PKG_NAME: ${PKG_NAME}"
+echo "PKG_OS: ${PKG_OS}"
+echo "PKG_SRCDIRNAME: ${PKG_SRCDIRNAME}"
+echo "PKG_TOPDIR: ${PKG_TOPDIR}"
+echo "PKG_URL: ${PKG_URL}"
+echo "PKG_VERSION: ${PKG_VERSION}"
+
+PKG_DISTDIR="MK_DIST/${PKG_OS}/${PKG_ARCH}/${PKG_NAME}-${PKG_VERSION}-${PKG_BUILD_VERSION}"
+PKG_BUILDDIR="MK_BUILD/${PKG_OS}/${PKG_ARCH}/${PKG_NAME}-${PKG_VERSION}-${PKG_BUILD_VERSION}"
+PKG_PATCHDIR="patches/${PKG_NAME}"
+
+echo "PKG_DISTDIR: ${PKG_DISTDIR}"
+echo "PKG_BUILDDIR: ${PKG_BUILDDIR}"
+echo "PKG_PATCHDIR: ${PKG_PATCHDIR}"
+
+tarball_name=$(basename $PKG_URL)
+
+set -x
+cd ${PKG_TOPDIR}
+rm -rf ${PKG_BUILDDIR} ${PKG_DISTDIR}
+mkdir -p ${PKG_BUILDDIR} ${PKG_DISTDIR}
+cd ${PKG_BUILDDIR}
+curl -Lso ${tarball_name} ${CURLFLAGS} ${PKG_URL}
+checksum=$(cmake -E sha256sum ${tarball_name} | awk '{print $1}')
+test "$checksum" = "${PKG_CHECKSUM}"
+tar -xzf ${tarball_name}
+cd ${PKG_SRCDIRNAME}
+set +x
+
+if [ -d "${PKG_TOPDIR}/${PKG_PATCHDIR}" ]; then
+  for patch in `ls ${PKG_TOPDIR}/${PKG_PATCHDIR}`; do
+    set -x
+    patch -Np1 -i "${PKG_TOPDIR}/${PKG_PATCHDIR}/$patch"
+    set +x
+  done
+fi
+
+if [ "${PKG_BOOTSTRAP}" != "" ]; then
+  set -x
+  ${PKG_BOOTSTRAP} ${BOOTSTRAPFLAGS}
+  set +x
+fi
+
+if [ "$PKG_BUILD_SYSTEM" = "cmake" ]; then
+  set -x
+  cmake "-G ${CMAKE_GENERATOR}" -DCMAKE_BUILD_TYPE=Release                     \
+         -DCMAKE_INSTALL_PREFIX=${PKG_TOPDIR}/${PKG_DISTDIR}                   \
+         ${CMAKEFLAGS} .
+  cmake --build --config=Release ${CMAKEBUILDFLAGS} .
+  cmake --build --target install --config=Release ${CMAKEINSTALLFLAGS} .
+  set +x
+
+elif [ "${PKG_BUILD_SYSTEM}" = "autotools" ]; then
+  set -x
+  ./configure --prefix=/ ${CONFIGUREFLAGS}
+  make
+  make install-strip DESTDIR=${PKG_TOPDIR}/${PKG_DISTDIR}
+  set +x
+
+else
+  echo "FATAL: invalid PKG_BUILD_SYSTEM" 1>&2
+  exit 1
+fi
+
+set -x
+rm -rf ${PKG_TOPDIR}/${PKG_DISTDIR}/etc
+rm -rf ${PKG_TOPDIR}/${PKG_DISTDIR}/lib/pkgconfig
+rm -rf ${PKG_TOPDIR}/${PKG_DISTDIR}/lib/*.la
+rm -rf ${PKG_TOPDIR}/${PKG_DISTDIR}/share

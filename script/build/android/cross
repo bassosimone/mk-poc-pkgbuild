@@ -21,8 +21,6 @@ echo "Cross compiling for $ARCH"
 # Place where make-toolchain creates a standalone toolchain
 export ANDROID_TOOLCHAIN=${ROOTDIR}/MK_BUILD/android/toolchain/${ARCH}
 
-# TODO: create toolchain if needed?
-
 # Directory under the toolchain where we have headers and libs
 export SYSROOT=${ANDROID_TOOLCHAIN}/sysroot
 
@@ -71,6 +69,17 @@ else
     exit 1
 fi
 
+if [ ! -d "${ANDROID_TOOLCHAIN}" ]; then
+  if [ "$ANDROID_NDK_ROOT" = "" ]; then
+    # TODO(bassosimone): this check should probably be moved in make-toolchain
+    echo "FATAL: please set ANDROID_NDK_ROOT" 1>&2
+    exit 1
+  fi
+  set -x
+  $ROOTDIR/script/build/android/make-toolchain $ANDROID_NDK_ROOT $ARCH
+  set +x
+fi
+
 # TODO: print also these flags
 
 # Override makefile's defaults with toolchain's tools. We use clang.
@@ -89,8 +98,8 @@ export STRIP=${TOOL_PREFIX}-strip
 export CPPFLAGS="${CPPFLAGS} --sysroot=${SYSROOT} -I${SYSROOT}/usr/include -I${ANDROID_TOOLCHAIN}/include"
 
 # Pass specific flags to the C and/or CXX compiler
-export CFLAGS="${CFLAGS} ${ANDROID_ARCH_FLAGS}"
-export CXXFLAGS="${CXXFLAGS} ${ANDROID_ARCH_FLAGS}"
+export CFLAGS="${CFLAGS} ${ANDROID_ARCH_FLAGS} -O2"
+export CXXFLAGS="${CXXFLAGS} ${ANDROID_ARCH_FLAGS} -O2"
 
 # Teach the linker to find toolchain libraries
 export LDFLAGS="${LDFLAGS} -L${SYSROOT}/usr/lib${LIB_SUFFIX} -L${ANDROID_TOOLCHAIN}/lib"

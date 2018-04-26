@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+PKG_TOPDIR=$(cd $(dirname $0)/../../ && pwd -P)
 base_url=https://github.com/measurement-kit/prebuilt/releases/download
 while [ $# -gt 0 ]; do
   package=$1 # E.g.: testing/iphonesimulator-x86_64-libressl-2.6.4-1
@@ -12,8 +13,9 @@ while [ $# -gt 0 ]; do
   build_version=`echo $basename | cut -d- -f5`
   set -x
   curl -Lso $basename.tar.gz $base_url/$package.tar.gz
-  checksum=`cat ./checksum/$os/$arch/$name-$version-$build_version.txt`
+  checksum=`cat ${PKG_TOPDIR}/checksum/$os/$arch/$name-$version-$build_version.txt`
   test "$checksum" = "`cmake -E sha256sum $basename.tar.gz | awk '{print $1}'`"
   tar -xzf $basename.tar.gz
+  rm -rf $basename.tar.gz
   set +x
 done

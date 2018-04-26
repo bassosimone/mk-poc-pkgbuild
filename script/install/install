@@ -8,12 +8,10 @@ while [ $# -gt 0 ]; do
   basename=`basename $package`
   os=`echo $basename | cut -d- -f1`
   arch=`echo $basename | cut -d- -f2`
-  name=`echo $basename | cut -d- -f3`
-  version=`echo $basename | cut -d- -f4`
-  build_version=`echo $basename | cut -d- -f5`
+  remainder=`echo $basename | cut -d- -f3-`
   set -x
   curl -Lso $basename.tar.gz $base_url/$package.tar.gz
-  checksum=`cat ${PKG_TOPDIR}/checksum/$os/$arch/$name-$version-$build_version.txt`
+  checksum=`cat ${PKG_TOPDIR}/checksum/$os/$arch/$remainder.txt`
   test "$checksum" = "`cmake -E sha256sum $basename.tar.gz | awk '{print $1}'`"
   tar -xzf $basename.tar.gz
   rm -rf $basename.tar.gz

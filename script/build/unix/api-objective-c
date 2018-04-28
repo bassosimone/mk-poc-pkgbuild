@@ -6,9 +6,9 @@ export PKG_BUILD_VERSION="1"
 MK_DIR=${PKG_TOPDIR}/MK_DIST/${PKG_OS}/${PKG_ARCH}/measurement_kit-0.9.0-alpha-2
 
 export PKG_NAME="api-objective-c"
-export PKG_CHECKSUM="75444fd23d8755ebeab86ec674ef520c7a2716429a1aa8ccf55acf0da04f2fe6"
-export PKG_VERSION="f9a3bd31a39e90fa656e8e55e2e7632d2fb27606"
-export PKG_URL="https://github.com/bassosimone/${PKG_NAME}/archive/${PKG_VERSION}.tar.gz"
+export PKG_CHECKSUM="32fffd105ae6b8e08570135fdca754e1e03478b928dc42ce9d9970fe27603984"
+export PKG_VERSION="0.1.0"
+export PKG_URL="https://github.com/bassosimone/${PKG_NAME}/archive/v${PKG_VERSION}.tar.gz"
 export CONFIGUREFLAGS="${CONFIGUREFLAGS} --with-mk=${MK_DIR}/include"
 export PKG_BUILD_SYSTEM="autotools"
 export PKG_SRCDIRNAME="api-objective-c-${PKG_VERSION}"
